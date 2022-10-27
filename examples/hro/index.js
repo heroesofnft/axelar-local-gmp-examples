@@ -44,7 +44,7 @@ async function deploy(chain, wallet) {
     NftLinkerProxy,
     [chain.gateway, chain.gasReceiver],
     [],
-    defaultAbiCoder.encode(['string', "address"], [chain.name, heroesToken.address]),
+    defaultAbiCoder.encode(['string', 'address'], [chain.name, heroesToken.address]),
     'hrolinker',
   );
 
@@ -73,14 +73,14 @@ async function test(chains, wallet, options) {
     //chain.hrotokencontract = await deployContract(chain.wallet, WhrmToken, []);
     chain.hrotokencontract = new Contract(chain.hrotoken, HeroesToken.abi, chain.wallet);
 
-    chain.hrolinkercontract =  await deployUpgradable(
+    chain.hrolinkercontract = await deployUpgradable(
       chain.constAddressDeployer,
       wallet.connect(provider),
       HeroesTokenLinker,
       NftLinkerProxy,
       [chain.gateway, chain.gasReceiver],
       [],
-      defaultAbiCoder.encode(['string', "address"], [chain.name, chain.hrotoken]),
+      defaultAbiCoder.encode(['string', 'address'], [chain.name, chain.hrotoken]),
       'hrolinker',
     );
 
@@ -141,11 +141,7 @@ async function test(chains, wallet, options) {
     console.log('giving bridge role to token linker contract');
     await sleep(500);
 
-    console.log(
-      chain.name,
-      'linker has minter role: ',
-      await chain.hrotokencontract.hasRole(bridgeRole, chain.hrolinkercontract.address),
-    );
+    console.log(chain.name, 'linker has minter role: ', await chain.hrotokencontract.hasRole(bridgeRole, chain.hrolinkercontract.address));
     await sleep(500);
   }
 
@@ -161,18 +157,15 @@ async function test(chains, wallet, options) {
   await sleep(3000);
   console.log('sending token: ');
 
+  console.log('########################');
   try {
-    tx = await source.hrolinkercontract.
-    sendNft(
-      destination.name,
-      wallet.address,
-      tokenId,
-      wallet.address, {
-        value: gasLimit * gasPrice,
-        gasLimit: gasLimit * 20,
+    tx = await source.hrolinkercontract.sendNft(destination.name, wallet.address, tokenId, wallet.address, {
+      value: BigInt(Math.floor(gasLimit * gasPrice)),
+      gasLimit: gasLimit * 20,
     });
 
     let receipt = await tx.wait();
+    console.log('Transaction status: ', receipt.status);
   } catch (error) {
     console.log('');
     console.log('ERROR !');
@@ -181,6 +174,7 @@ async function test(chains, wallet, options) {
 
   await sleep(4000);
 
+  console.log('');
   console.log('--- After ---');
   await print();
 }
