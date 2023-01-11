@@ -39,6 +39,10 @@ async function deploy(chain, wallet) {
     console.log(`Minting token ${tokenId} for ${chain.name}`);
     await (await erc721.mint(tokenId)).wait();
     console.log(`Minted token ${tokenId} for ${chain.name}`);
+
+
+  console.log('gasReceiver: ', await contract.gasReceiver(), 'vs', chain.gasReceiver);
+  console.log('gateway: ', await contract.gateway(), 'vs', chain.gateway);
 }
 
 async function test(chains, wallet, options) {
